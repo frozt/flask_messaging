@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import datetime
+from sqlalchemy.orm import relationship
 
 
 app = Flask(__name__)
@@ -39,6 +40,7 @@ class Message(db.Model):
 
     def toJson(self):
         return {
+            'id': self.id,
             'sender': self.sender,
             'receiver': self.receiver,
             'time': self.msg_timestamp,

@@ -16,3 +16,9 @@ Step 3: Start running the server
 -------------------------------------
 
 python app.py
+
+
+Step 4: First call init view to initialize the DB
+-------------------------------------------------
+
+http://127.0.0.1:5000/init
