@@ -1,7 +1,7 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import datetime
-import json
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///trioptima.db'
@@ -27,6 +27,7 @@ class Message(db.Model):
     message = db.Column(db.Text)
     msg_timestamp = db.Column(db.DateTime)
     fetched = db.Column(db.Boolean)
+    deleted = db.Column(db.Boolean)
 
     def __init__(self, sender, receiver, message):
         self.sender = sender
@@ -34,9 +35,15 @@ class Message(db.Model):
         self.message = message
         self.msg_timestamp = datetime.datetime.now()
         self.fetched = False
+        self.deleted = False
 
-    def __repr__(self):
-        return json.dumps(self.__dict__)
+    def toJson(self):
+        return {
+            'sender': self.sender,
+            'receiver': self.receiver,
+            'time': self.msg_timestamp,
+            'message': self.message
+        }
 
 
 

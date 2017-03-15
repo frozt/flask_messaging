@@ -1,7 +1,33 @@
 from flask import request, jsonify
+from flask.views import MethodView
 from os import abort
 from models import User, Message, db, app
 
+
+class JsonPostRequest(MethodView):
+    def post(self):
+        # check if request is in json format
+        if not request.json:
+            abort(400)
+
+        # if one of the required keys is missing abort request
+        try:
+            return self.process_post()
+        except KeyError:
+            abort(400)
+
+    def process_post(self):
+        raise NotImplementedError()
+
+
+class SendMessage(JsonPostRequest):
+    def process_post(self):
+        msg = Message(request.json['sender'], request.json['receiver'], request.json['message'])
+        db.session.add(msg)
+        db.session.commit()
+        return 'Successfully inserted'
+
+app.add_url_rule('/send', view_func=SendMessage.as_view('send'))
 
 @app.route('/')
 def index():
@@ -20,38 +46,29 @@ def init():
     return 'Success'
 
 
-@app.route('/get_messages', methods=['GET'])
+
+@app.route('/get_messages', methods=['POST'])
 def get_messages():
     pass
 
 
-@app.route('/get', methods=['GET'])
-def get_single_message():
-    pass
+@app.route('/get/<int:id>', methods=['GET'])
+def get_single_message(id):
+    msg = Message.query.filter_by(id=id, deleted=False).first()
+    return jsonify(msg.toJson())
 
 
 @app.route('/fetch/<string:username>', methods=['GET'])
 def fetch_new_messages(username):
     new_msgs = Message.query.filter_by(receiver=username, fetched=False).all()
+    msgs_json = list()
     for msg in new_msgs:
         msg.fetched = True
-
+        msgs_json.append(msg.toJson())
     db.session.commit()
-    return jsonify(dict(new_msgs))
 
+    return jsonify(msgs_json)
 
-@app.route('/send', methods=['POST'])
-def send_message():
-    if not request.json:
-        abort(400)
-
-    try:
-        msg = Message(request.json['sender'], request.json['receiver'], request.json['message'])
-        db.session.add(msg)
-        db.session.commit()
-        return 'Successfully inserted'
-    except KeyError:
-        abort(400)
 
 
 @app.route('/delete', methods=['POST'])
