@@ -22,3 +22,45 @@ Step 4: First call init view to initialize the DB
 -------------------------------------------------
 
 http://127.0.0.1:5000/init
+
+
+
+-------------------
+Available links
+-------------------
+Hello world
+GET: http://127.0.0.1:5000/
+
+DB init
+GET: http://127.0.0.1:5000/init
+
+Get multiple messages
+POST : http://127.0.0.1:5000/messages
+{
+    "username": "a"
+    "start": 1,
+    "end": 3,
+}
+
+Get single message
+GET : http://127.0.0.1:5000/messages/<msg_id>
+
+Delete single message
+DELETE: http://127.0.0.1:5000/messages/<msg_id>
+
+Send message
+POST: http://127.0.0.1:5000/send
+{
+    "sender": "a",
+    "receiver": "b",
+    "message": "Test message"
+}
+
+Delete multiple messages
+POST: http://127.0.0.1:5000/delete
+{
+    "messages": [1,2]
+}
+
+Fetch new messages for user
+GET: http://127.0.0.1:5000/fetch/<username>
